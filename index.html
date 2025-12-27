@@ -3,22 +3,163 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Currency Converter</title>
+  <title>Currency Converter Pro</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="app-container">
-    <h1>💱 Currency Converter</h1>
-    <div class="converter-card">
-      <input type="number" id="amount" placeholder="Enter amount" />
-      <div class="dropdowns">
-        <select id="from-currency"></select>
-        <span>➡️</span>
-        <select id="to-currency"></select>
+    <!-- Header -->
+    <div class="header">
+      <h1>💱 Currency Converter Pro</h1>
+      <p class="subtitle">Real-time exchange rates • Multi-currency support</p>
+      <p class="last-update" id="lastUpdate">Last updated: --:--:--</p>
+    </div>
+
+    <div class="main-grid">
+      <!-- Main Converter Card -->
+      <div class="converter-section">
+        <div class="converter-card">
+          <!-- Amount Input -->
+          <div class="input-group">
+            <label>Amount</label>
+            <div class="amount-input-wrapper">
+              <input 
+                type="number" 
+                id="amount" 
+                placeholder="Enter amount" 
+                value="100"
+                class="amount-input"
+              />
+              <button class="calc-btn" id="calcBtn" title="Calculator">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+                  <line x1="8" y1="6" x2="16" y2="6"></line>
+                  <line x1="16" y1="10" x2="16" y2="10"></line>
+                  <line x1="8" y1="10" x2="8" y2="10"></line>
+                  <line x1="12" y1="10" x2="12" y2="10"></line>
+                  <line x1="16" y1="14" x2="16" y2="14"></line>
+                  <line x1="8" y1="14" x2="8" y2="14"></line>
+                  <line x1="12" y1="14" x2="12" y2="14"></line>
+                  <line x1="8" y1="18" x2="16" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Currency Selectors -->
+          <div class="currency-selectors">
+            <div class="currency-select-group">
+              <label>From</label>
+              <div class="select-wrapper">
+                <select id="fromCurrency" class="currency-select"></select>
+                <button class="star-btn" id="starFrom">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <button class="swap-btn" id="swapBtn">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="17 1 21 5 17 9"></polyline>
+                <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                <polyline points="7 23 3 19 7 15"></polyline>
+                <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+              </svg>
+            </button>
+
+            <div class="currency-select-group">
+              <label>To</label>
+              <div class="select-wrapper">
+                <select id="toCurrency" class="currency-select"></select>
+                <button class="star-btn" id="starTo">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Result -->
+          <div id="resultContainer" class="result-container hidden">
+            <p class="result-label">Converted Amount</p>
+            <p class="result-amount" id="resultAmount">0.00 USD</p>
+            <p class="result-rate" id="resultRate">1 USD = 1.0000 USD</p>
+            <p class="result-date" id="resultDate">As of 2024-01-01</p>
+          </div>
+
+          <div id="loader" class="loader hidden">
+            <div class="spinner"></div>
+            <p>Converting...</p>
+          </div>
+
+          <!-- Quick Convert -->
+          <div class="quick-convert">
+            <p class="section-label">Quick Convert</p>
+            <div class="quick-buttons" id="quickButtons"></div>
+          </div>
+        </div>
       </div>
-      <button onclick="convertCurrency()">Convert</button>
-      <div id="loader" class="hidden">🔄 Converting...</div>
-      <p id="result">Converted amount will appear here</p>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Live Rates -->
+        <div class="card">
+          <div class="card-header">
+            <h3>📈 Live Rates (<span id="baseRateCurrency">USD</span>)</h3>
+          </div>
+          <div class="live-rates" id="liveRates">
+            <p class="loading-text">Loading rates...</p>
+          </div>
+        </div>
+
+        <!-- History -->
+        <div class="card">
+          <div class="card-header">
+            <h3>🕐 History</h3>
+            <button class="clear-btn" id="clearHistory">Clear</button>
+          </div>
+          <div class="history-list" id="historyList">
+            <p class="empty-text">No history yet</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calculator Modal -->
+  <div id="calculatorModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Calculator</h3>
+        <button class="close-btn" id="closeCalc">&times;</button>
+      </div>
+      <div class="calc-display" id="calcDisplay">0</div>
+      <div class="calc-buttons">
+        <button class="calc-btn-key" data-value="7">7</button>
+        <button class="calc-btn-key" data-value="8">8</button>
+        <button class="calc-btn-key" data-value="9">9</button>
+        <button class="calc-btn-key operator" data-value="/">÷</button>
+        
+        <button class="calc-btn-key" data-value="4">4</button>
+        <button class="calc-btn-key" data-value="5">5</button>
+        <button class="calc-btn-key" data-value="6">6</button>
+        <button class="calc-btn-key operator" data-value="*">×</button>
+        
+        <button class="calc-btn-key" data-value="1">1</button>
+        <button class="calc-btn-key" data-value="2">2</button>
+        <button class="calc-btn-key" data-value="3">3</button>
+        <button class="calc-btn-key operator" data-value="-">−</button>
+        
+        <button class="calc-btn-key" data-value="0">0</button>
+        <button class="calc-btn-key" data-value=".">.</button>
+        <button class="calc-btn-key equals" data-value="=">=</button>
+        <button class="calc-btn-key operator" data-value="+">+</button>
+        
+        <button class="calc-btn-key clear" id="calcClear">Clear</button>
+      </div>
     </div>
   </div>
 
